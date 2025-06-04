@@ -1,6 +1,6 @@
 from textual.app import App
 from textual.binding import Binding
-from compoents import TodoHeader, TodoFooter, TodoContent
+from components import TodoHeader, TodoFooter, TodoContent
 from types_ import TodoItemData
 
 TITLE = "TODO"
@@ -30,7 +30,7 @@ class TodoApp(App):
 
     def compose(self):
         yield TodoHeader()
-        yield TodoContent()
+        yield TodoContent(id="todo-content", data=data)
         yield TodoFooter()
 
 
