@@ -7,7 +7,7 @@ from textual.binding import Binding
 TITLE = "TODO"
 
 
-class TodoData:
+class TodoItemData:
     def __init__(self, text: str, checked: bool = False, fileLine: int = 0):
         self.text = text
         self.checked = checked
@@ -15,15 +15,15 @@ class TodoData:
 
 
 data = [
-    TodoData("Dune", True, 1),
-    TodoData("Dune Messiah", False, 2),
-    TodoData("Children of Dune", False, 2),
-    TodoData("God Emperor of Dune", False, 3),
-    TodoData("Heretics of Dune", False, 4),
-    TodoData("Chapterhouse: Dune", False, 5),
-    TodoData("The Butlerian Jihad", False, 6),
-    TodoData("The Machine Crusade", False, 7),
-    TodoData("The Battle of Corrin", False, 8)]
+    TodoItemData("Dune", True, 1),
+    TodoItemData("Dune Messiah", False, 2),
+    TodoItemData("Children of Dune", False, 2),
+    TodoItemData("God Emperor of Dune", False, 3),
+    TodoItemData("Heretics of Dune", False, 4),
+    TodoItemData("Chapterhouse: Dune", False, 5),
+    TodoItemData("The Butlerian Jihad", False, 6),
+    TodoItemData("The Machine Crusade", False, 7),
+    TodoItemData("The Battle of Corrin", False, 8)]
 
 
 class TodoItem(Checkbox):
