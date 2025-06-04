@@ -27,8 +27,7 @@ data = [
 
 
 class TodoItem(Checkbox):
-    def _on_mount(self):
-        pass
+    pass
 
 
 class TodoContext(VerticalScroll):
