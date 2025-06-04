@@ -1,17 +1,9 @@
 from textual.app import App
-from textual.widgets import Header, Checkbox, Footer
-from textual.widgets._toggle_button import ToggleButton
-from textual.containers import VerticalScroll
 from textual.binding import Binding
+from compoents import TodoHeader, TodoFooter, TodoContent
+from types_ import TodoItemData
 
 TITLE = "TODO"
-
-
-class TodoItemData:
-    def __init__(self, text: str, checked: bool = False, fileLine: int = 0):
-        self.text = text
-        self.checked = checked
-        self.fileline = fileLine
 
 
 data = [
@@ -26,21 +18,6 @@ data = [
     TodoItemData("The Battle of Corrin", False, 8)]
 
 
-class TodoItem(Checkbox):
-    def _on_mount(self):
-        pass
-
-
-class TodoContext(VerticalScroll):
-    def compose(self):
-        for index, item in enumerate(data):
-            yield TodoItem(item.text, item.checked, id=f"item_id_{index}")
-
-    def on_mount(self):
-        pass
-        self.query_one("#item_id_0", Checkbox).focus()
-
-
 class TodoApp(App):
     CSS_PATH = "global.tcss"
     BINDINGS = [
@@ -52,9 +29,9 @@ class TodoApp(App):
         self.title = TITLE
 
     def compose(self):
-        yield Header()
-        yield TodoContext()
-        yield Footer()
+        yield TodoHeader()
+        yield TodoContent()
+        yield TodoFooter()
 
 
 if __name__ == "__main__":
