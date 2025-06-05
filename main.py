@@ -48,11 +48,9 @@ class TodoApp(App):
     def load(self, path: str):
         """Load todos from a file."""
         self.todo_store.load(path)
-        # self.query_one(TodoContent).refresh()
-
 
 @click.command()
-@click.argument("file", default="todos.md")
+@click.argument("file")
 def cli(file):
     """Run the TODO application."""
     try:
