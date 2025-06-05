@@ -41,6 +41,18 @@ class TodoStore(DOMNode):
         except Exception as e:
             print(f"保存todos到markdown失败: {e}")
 
+    def update_text(self, index: int, new_text: str):
+        """更新指定索引的Todo项文本"""
+        if 0 <= index < len(self.status):
+            self.status[index].text = new_text
+            self.save()
+
+    def update_status(self, index: int, completed: bool):
+        """更新指定索引的Todo项完成状态"""
+        if 0 <= index < len(self.status):
+            self.status[index].checked = completed
+            self.save()
+
 
 todo_store = TodoStore()
 
