@@ -1,3 +1,15 @@
 TodoItem {
+    height: 1;
+    margin: 0;
+    border: none;
+}
+
+TodoItem Checkbox {
+    border: none;
+}
+
+TodoItem Input {
+    height: 1;
+    margin: 0;
     border: none;
 }

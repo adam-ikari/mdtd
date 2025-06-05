@@ -5,13 +5,14 @@ from textual import events, on
 from textual.css.query import NoMatches
 
 class TodoItem(Widget):
-    DEFAULT_CSS = """
-    TodoItem {
-        height: 3;
-        margin: 1 0;
-    }
-    """
-    """重构后的TodoItem组件，组合Checkbox和Input"""
+    # DEFAULT_CSS = """
+    # TodoItem {
+    #     height: 1;
+    #     margin: 1 0;
+    #     border: none;
+    # }
+    # """
+    # """重构后的TodoItem组件，组合Checkbox和Input"""
     is_editing = reactive(False)
     index = reactive(0)
     label = reactive("")
