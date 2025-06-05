@@ -1,25 +1,22 @@
 from textual.containers import VerticalScroll
-from types_ import TodoItemData
 from .TodoItem import TodoItem
-from textual.reactive import reactive
 from store.todos import use_todos
+
 
 class TodoContent(VerticalScroll):
     todos = use_todos()
-    
+
     def __init__(self, id: str):
         super().__init__(id=id)
 
     def compose(self):
-        for index, item in enumerate(self.todos):
-            yield TodoItem(label=item.text, value=item.checked, id=f"item_id_{index}")
+        for item in self.todos:
+            yield TodoItem(label=item.text, value=item.checked, id=f"todo_item_id_{item.id}", index=item.id)
 
     def on_mount(self):
         if len(self.todos) > 0:
-            self.query_one("#item_id_0", TodoItem).focus()
-            
+            self.query_one(TodoItem).focus()
+
     def on_checkbox_changed(self, event):
         item = event.checkbox
-        index = int(item.id.split("_")[-1])
-        self.todos[index].checked = item.value
-        self.refresh()
+        self.todos[item.index].checked = item.value

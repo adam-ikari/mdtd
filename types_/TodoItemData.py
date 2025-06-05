@@ -1,5 +1,6 @@
 class TodoItemData:
-    def __init__(self, text: str, checked: bool = False, fileLine: int = 0):
+    def __init__(self, id:int, text: str, checked: bool = False, fileLine: int = 0):
+        self.id = id
         self.text = text
         self.checked = checked
         self.fileline = fileLine
