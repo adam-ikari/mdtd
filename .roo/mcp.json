@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "textual Docs": {
+      "type": "sse",
+      "url": "https://gitmcp.io/Textualize/textual",
+      "alwaysAllow": [
+        "search_textual_documentation",
+        "fetch_textual_documentation"
+      ]
+    }
+  }
+}

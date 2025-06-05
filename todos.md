@@ -1,5 +1,5 @@
 # TODO List
 
-- [x] new todo
-- [x] another todo
+- [ ] new tod222o
+- [ ] another todo
 - [x] yet another todo
