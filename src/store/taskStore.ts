@@ -135,11 +135,44 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const { tasks, selected } = get();
     if (tasks[selected]) {
       const newTasks = [...tasks];
+      const toggledTask = newTasks[selected];
+      const originalLevel = toggledTask.level || 0;
+      const newCompletedStatus = !toggledTask.completed;
+      
       // 切换当前任务状态
       newTasks[selected] = {
-        ...newTasks[selected],
-        completed: !newTasks[selected].completed
+        ...toggledTask,
+        completed: newCompletedStatus
       };
+
+      // 如果是父任务，需要处理子任务
+      if (newCompletedStatus) {
+        // 父任务完成，需要完成所有子任务
+        for (let i = selected + 1; i < newTasks.length; i++) {
+          if ((newTasks[i].level || 0) <= originalLevel) {
+            // 遇到了同级或更高级别的任务，说明已超出当前父任务的子树范围
+            break;
+          }
+          // 设置子任务状态为完成
+          newTasks[i] = {
+            ...newTasks[i],
+            completed: true
+          };
+        }
+      } else {
+        // 父任务未完成，需要将所有子任务也设置为未完成
+        for (let i = selected + 1; i < newTasks.length; i++) {
+          if ((newTasks[i].level || 0) <= originalLevel) {
+            // 遇到了同级或更高级别的任务，说明已超出当前父任务的子树范围
+            break;
+          }
+          // 设置子任务状态为未完成
+          newTasks[i] = {
+            ...newTasks[i],
+            completed: false
+          };
+        }
+      }
 
       // 检查并更新父任务状态
       const updateParentTask = (taskIndex: number) => {
