@@ -8,10 +8,22 @@
 npm install -g mdtd
 ```
 
+或使用 Bun：
+
+```bash
+bun add -g mdtd
+```
+
 或使用 npx 直接运行：
 
 ```bash
 npx mdtd
+```
+
+或使用 bunx 直接运行：
+
+```bash
+bunx mdtd
 ```
 
 ## 使用
@@ -68,18 +80,24 @@ mdtd filename.md
 
    ```bash
    npm install
+   # 或
+   bun install
    ```
 
 3. 构建项目：
 
    ```bash
    npm run build
+   # 或
+   bun run build
    ```
 
 4. 运行应用：
 
    ```bash
    npm start
+   # 或开发模式（热重载）
+   bun run dev
    ```
 
 ## 贡献

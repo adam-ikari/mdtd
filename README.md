@@ -8,10 +8,22 @@ A minimalist terminal UI todo app built with Ink and React
 npm install -g mdtd
 ```
 
+Or use Bun:
+
+```bash
+bun add -g mdtd
+```
+
 Or use npx to run it directly:
 
 ```bash
 npx mdtd
+```
+
+Or use bunx to run it directly:
+
+```bash
+bunx mdtd
 ```
 
 ## Usage
@@ -68,18 +80,24 @@ Tasks are stored in standard Markdown checkbox format:
 
    ```bash
    npm install
+   # or
+   bun install
    ```
 
 3. Build the project:
 
    ```bash
    npm run build
+   # or
+   bun run build
    ```
 
 4. Run the app:
 
    ```bash
    npm start
+   # or for development with hot reload
+   bun run dev
    ```
 
 ## Contributing
