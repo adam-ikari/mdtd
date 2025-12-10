@@ -1,6 +1,6 @@
 # mdtd
 
-A beautiful terminal UI todo app built with Ink and React
+A minimalist terminal UI todo app built with Ink and React
 
 ## Installation
 
@@ -16,16 +16,49 @@ npx mdtd
 
 ## Usage
 
-After installation, run:
+Run without arguments to create/open `todo.md`:
 
 ```bash
 mdtd
 ```
 
-or
+Or specify a custom file:
 
 ```bash
 mdtd filename.md
+```
+
+## Features
+
+- **Minimalist Design**: Clean, simple interface focused on productivity
+- **Pure Markdown**: Tasks stored in standard Markdown format for maximum compatibility
+- **Task Hierarchy**: Support for nested tasks
+- **Keyboard-First**: Vim-style navigation for efficient task management
+- **Multi-language Support**: English and Chinese interface
+- **Git-Friendly**: Plain text files work perfectly with version control
+
+## Controls
+
+- `j/k` or `↑/↓` - Navigate tasks
+- `a` - Add new task
+- `e` - Edit selected task
+- `Space` - Toggle task completion
+- `d` - Delete selected task
+- `Shift+j/k` - Move task up/down
+- `h/l` - Decrease/Increase task level
+- `q` - Quit
+
+## Markdown Format
+
+Tasks are stored in standard Markdown checkbox format:
+
+```markdown
+# Tasks
+
+- [ ] Parent task
+  - [ ] Child task
+    - [ ] Sub-child task
+- [x] Completed task
 ```
 
 ## Development
@@ -48,13 +81,6 @@ mdtd filename.md
    ```bash
    npm start
    ```
-
-## Features
-
-- Interactive terminal interface
-- Add, complete and delete tasks
-- Persistent storage
-- Multi-language support
 
 ## Contributing
 
