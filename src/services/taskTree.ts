@@ -330,11 +330,9 @@ export class TaskTreeUtils {
       return false;
     }
     
-    const currentLevel = tasks[taskIndex].level;
-    const prevTaskLevel = tasks[taskIndex - 1].level;
-    
-    // 如果前一个任务的层级大于等于当前任务的层级，可以降低
-    return prevTaskLevel >= currentLevel;
+    // 只要不是第一个任务，总是可以降低层级
+    // 因为可以成为前一个任务的子任务
+    return true;
   }
 
   /**
@@ -359,13 +357,16 @@ export class TaskTreeUtils {
       
       const prevTaskLevel = tasks[taskIndex - 1].level;
       
-      if (currentLevel === 0) {
-        // 顶级任务降级：成为前一个任务的子任务
-        return prevTaskLevel + 1;
-      } else {
-        // 非顶级任务降级
-        return prevTaskLevel < currentLevel ? prevTaskLevel : currentLevel - 1;
+      // 降级时，新层级应该是前一个任务的层级+1
+      // 但要确保不会超过当前层级+1（避免层级跳跃过大）
+      const targetLevel = prevTaskLevel + 1;
+      
+      // 如果目标层级大于当前层级+1，则只降低一级
+      if (targetLevel > currentLevel + 1) {
+        return currentLevel + 1;
       }
+      
+      return targetLevel;
     }
   }
 }
