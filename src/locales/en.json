@@ -8,6 +8,11 @@
   "messageToggled": "Toggled: \"{task}\"",
   "messageDeleted": "Deleted: \"{task}\"",
   "messageEdited": "Edited: \"{task}\"",
-  "controlsList": "(a)dd | (e)dit | (space) Toggle Done | (d)elete | (j/k)select | (shift+j/k)move | (q)uit",
+  "messageCannotPromote": "Cannot promote task: no parent task found",
+  "messageCannotDemote": "Cannot demote first task",
+  "messageCannotMove": "Cannot move task to this position",
+  "messageTaskPromoted": "Task promoted",
+  "messageTaskDemoted": "Task demoted",
+  "controlsList": "(a)dd | (e)dit | (space) Toggle Done | (d)elete | (j/k)select | (shift+j/k)move | (h/l)indent | (q)uit",
   "controlsAdd": "Type task and press Enter to save"
 }

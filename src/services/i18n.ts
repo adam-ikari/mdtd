@@ -12,7 +12,12 @@ export type TKey =
 	| 'messageToggled'
 	| 'messageDeleted'
 	| 'controlsList'
-	| 'controlsAdd';
+	| 'controlsAdd'
+	| 'messageCannotPromote'
+	| 'messageCannotDemote'
+	| 'messageCannotMove'
+	| 'messageTaskPromoted'
+	| 'messageTaskDemoted';
 
 const translationsMap = {
 	en: enTranslations,

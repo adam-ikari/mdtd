@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Text, Box, Newline, useInput, useApp } from "ink";
 import { useTaskStore } from "@/store/taskStore.ts";
 import { Task, writeTasks } from "@/services/fileManager.ts";
@@ -23,6 +23,8 @@ export default function App() {
     addTask,
     toggleTask,
     deleteTask,
+    promoteTask,
+    demoteTask,
   } = useTaskStore();
 
   useInput((input, key) => {
@@ -45,59 +47,11 @@ export default function App() {
       } else if (key.shift && (key.upArrow || input === "k" || input === "K")) {
         moveTaskUp();
       } else if (key.leftArrow || input === "h" || input === "H") {
-        // 提升层级到父任务同级
-        const { tasks, selected } = useTaskStore.getState();
-        const currentLevel = tasks[selected]?.level || 0;
-
-        // 查找最近的父任务
-        let parentLevel = -1;
-        for (let i = selected - 1; i >= 0; i--) {
-          if ((tasks[i].level || 0) < currentLevel) {
-            parentLevel = tasks[i].level || 0;
-            break;
-          }
-        }
-
-        if (parentLevel >= 0) {
-          const newTasks = tasks.map(
-            (task: Task & { level?: number }, i: number) =>
-              i === selected ? { ...task, level: parentLevel } : task
-          );
-          useTaskStore.setState({ tasks: newTasks });
-          writeTasks(newTasks, useTaskStore.getState().filePath);
-        } else {
-          useTaskStore.setState({
-            message: "无法提升层级：找不到父任务",
-          });
-        }
+        // 提升层级
+        promoteTask();
       } else if (key.rightArrow || input === "l" || input === "L") {
         // 降低层级
-        const { tasks, selected } = useTaskStore.getState();
-        const currentLevel = tasks[selected]?.level || 0;
-        if (selected > 0) {
-          // 确保不是第一个任务
-          const prevLevel = tasks[selected - 1]?.level || 0;
-          let newLevel = currentLevel;
-
-          if (currentLevel === 0) {
-            // 顶级任务降级
-            newLevel = prevLevel + 1; // 成为上一行任务的子任务
-          } else {
-            // 非顶级任务降级
-            newLevel = prevLevel < currentLevel ? prevLevel : currentLevel - 1;
-          }
-
-          const newTasks = tasks.map(
-            (task: Task & { level?: number }, i: number) =>
-              i === selected ? { ...task, level: newLevel } : task
-          );
-          useTaskStore.setState({ tasks: newTasks });
-          writeTasks(newTasks, useTaskStore.getState().filePath);
-        } else {
-          useTaskStore.setState({
-            message: "第一个任务不能降低层级",
-          });
-        }
+        demoteTask();
       } else if (key.downArrow || input === "j" || input === "J") {
         moveDown();
       } else if (key.upArrow || input === "k" || input === "K") {
@@ -132,43 +86,67 @@ export default function App() {
   });
 
   if (mode === "loading") {
-    return <Text>Loading...</Text>;
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Text color="blue" bold>{t("appTitle")}</Text>
+        <Newline />
+        <Text color="gray">Loading tasks...</Text>
+      </Box>
+    );
   }
 
   if (mode === "error") {
-    return <Text color="red">{message}</Text>;
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Text color="red" bold>{t("appTitle")}</Text>
+        <Newline />
+        <Text color="red">{message}</Text>
+      </Box>
+    );
   }
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Text bold>{t("appTitle")}</Text>
+      <Text color="blue" bold>{t("appTitle")}</Text>
       <Newline />
 
-      {tasks.map((task: Task & { level?: number }, index: number) => (
-        <Text key={index} color={selected === index ? "cyan" : "white"}>
-          {selected === index ? "> " : "  "}
-          {"  ".repeat(task.level || 0)}[{task.completed ? "x" : " "}]{" "}
-          {task.label}
-        </Text>
-      ))}
-      {tasks.length === 0 && mode === "list" && <Text>{t("noTasks")}</Text>}
+      {tasks.length === 0 && mode === "list" ? (
+        <Text color="gray" italic>{t("noTasks")}</Text>
+      ) : (
+        tasks.map((task: Task & { level?: number }, index: number) => (
+          <Box key={index} marginLeft={task.level || 0}>
+            <Text color={selected === index ? "cyan" : task.completed ? "gray" : "white"}>
+              {selected === index ? "▶ " : "  "}
+              [{task.completed ? "x" : " "}]{" "}
+              <Text strikethrough={task.completed}>
+                {task.label}
+              </Text>
+            </Text>
+          </Box>
+        ))
+      )}
 
       <Newline />
 
       {(mode === "add" || mode === "edit") && (
-        <InputBox
-          inputValue={inputValue}
-          label={
-            mode === "add"
+        <Box>
+          <Text color="green">
+            {mode === "add"
               ? t("addTaskPrompt", { inputValue: "" })
-              : t("editTaskPrompt", { inputValue: "" })
-          }
-        />
+              : t("editTaskPrompt", { inputValue: "" })}
+          </Text>
+          <Newline />
+          <InputBox inputValue={inputValue} />
+        </Box>
       )}
 
-      {message && <Text color="green">{message}</Text>}
+      {message && (
+        <Box marginTop={1}>
+          <Text color="green">{message}</Text>
+        </Box>
+      )}
 
-      <Box marginTop={1}>
+      <Box marginTop={1} borderStyle="round" paddingX={1}>
         <Text color="gray">
           {mode === "list" ? t("controlsList") : t("controlsAdd")}
         </Text>

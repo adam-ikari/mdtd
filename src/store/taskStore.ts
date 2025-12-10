@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { Task, readTasks, writeTasks } from "@/services/fileManager.ts";
+import { TaskTreeUtils, TaskWithLevel } from "@/services/taskTree.ts";
 import { loadTranslations as i18nLoad, t, TKey } from "@/services/i18n.ts";
 
 type Mode = "list" | "add" | "edit" | "error" | "loading";
 
 interface TaskState {
   // State
-  tasks: (Task & { level?: number })[];
+  tasks: TaskWithLevel[];
   selected: number;
   mode: Mode;
   inputValue: string;
@@ -27,6 +28,8 @@ interface TaskState {
   toggleTask: () => void;
   deleteTask: () => void;
   editTask: (newLabel: string) => void;
+  promoteTask: () => void;
+  demoteTask: () => void;
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
@@ -78,14 +81,22 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const { tasks, selected, filePath } = get();
     if (selected <= 0 || tasks.length <= 1) return;
 
-    const newTasks = [...tasks];
-    [newTasks[selected], newTasks[selected - 1]] = [
-      newTasks[selected - 1],
-      newTasks[selected],
-    ];
+    // 检查是否可以向上移动
+    const targetIndex = Math.max(0, selected - 1);
+    if (!TaskTreeUtils.canMoveTaskToPosition(tasks, selected, targetIndex)) {
+      set({ message: t("messageCannotMove") });
+      return;
+    }
+
+    // 移动任务及其子任务
+    const newTasks = TaskTreeUtils.moveTaskWithChildren(tasks, selected, targetIndex);
+    
+    // 更新选中位置
+    const newSelected = Math.max(0, selected - 1);
+    
     set({
       tasks: newTasks,
-      selected: selected - 1,
+      selected: newSelected,
     });
     writeTasks(newTasks, filePath);
   },
@@ -94,14 +105,26 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const { tasks, selected, filePath } = get();
     if (selected >= tasks.length - 1 || tasks.length <= 1) return;
 
-    const newTasks = [...tasks];
-    [newTasks[selected], newTasks[selected + 1]] = [
-      newTasks[selected + 1],
-      newTasks[selected],
-    ];
+    // 获取任务及其子任务的数量
+    const childIndices = TaskTreeUtils.getChildTaskIndices(tasks, selected);
+    const totalTasksToMove = childIndices.length + 1;
+    
+    // 检查是否可以向下移动
+    const targetIndex = Math.min(tasks.length - totalTasksToMove, selected + totalTasksToMove);
+    if (!TaskTreeUtils.canMoveTaskToPosition(tasks, selected, targetIndex)) {
+      set({ message: t("messageCannotMove") });
+      return;
+    }
+
+    // 移动任务及其子任务
+    const newTasks = TaskTreeUtils.moveTaskWithChildren(tasks, selected, targetIndex);
+    
+    // 更新选中位置
+    const newSelected = Math.min(tasks.length - 1, selected + 1);
+    
     set({
       tasks: newTasks,
-      selected: selected + 1,
+      selected: newSelected,
     });
     writeTasks(newTasks, filePath);
   },
@@ -134,40 +157,9 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   toggleTask: () => {
     const { tasks, selected } = get();
     if (tasks[selected]) {
-      const newTasks = [...tasks];
-      // 切换当前任务状态
-      newTasks[selected] = {
-        ...newTasks[selected],
-        completed: !newTasks[selected].completed
-      };
-
-      // 检查并更新父任务状态
-      const updateParentTask = (taskIndex: number) => {
-        const currentLevel = newTasks[taskIndex].level || 0;
-        // 查找父任务(最近的level较小的任务)
-        for (let i = taskIndex - 1; i >= 0; i--) {
-          if ((newTasks[i].level || 0) < currentLevel) {
-            // 检查所有子任务是否完成
-            const children = newTasks.slice(i + 1).filter(
-              t => (t.level || 0) > (newTasks[i].level || 0)
-            );
-            const allChildrenCompleted = children.every(t => t.completed);
-            // 更新父任务状态
-            if (allChildrenCompleted !== newTasks[i].completed) {
-              newTasks[i] = {
-                ...newTasks[i],
-                completed: allChildrenCompleted
-              };
-              // 递归更新更上层的父任务
-              updateParentTask(i);
-            }
-            break;
-          }
-        }
-      };
-
-      updateParentTask(selected);
-
+      // 使用任务树工具类切换任务状态
+      const newTasks = TaskTreeUtils.toggleTaskWithParentChildSync(tasks, selected);
+      
       const task = newTasks[selected];
       set({
         tasks: newTasks,
@@ -181,7 +173,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const { tasks, selected } = get();
     if (tasks[selected]) {
       const taskToDelete = tasks[selected];
-      const newTasks = tasks.filter((_, i) => i !== selected);
+      
+      // 使用任务树工具类删除任务及其子任务
+      const newTasks = TaskTreeUtils.deleteTaskWithChildren(tasks, selected);
+      
       const newSelected =
         selected >= newTasks.length && newTasks.length > 0
           ? newTasks.length - 1
@@ -208,5 +203,39 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       });
       writeTasks(newTasks, get().filePath);
     }
+  },
+
+  promoteTask: () => {
+    const { tasks, selected, filePath } = get();
+    if (!TaskTreeUtils.canPromoteTask(tasks, selected)) {
+      set({ message: t("messageCannotPromote") });
+      return;
+    }
+
+    const newLevel = TaskTreeUtils.calculateNewTaskLevel(tasks, selected, 'up');
+    const newTasks = TaskTreeUtils.adjustTaskLevel(tasks, selected, newLevel);
+    
+    set({
+      tasks: newTasks,
+      message: t("messageTaskPromoted"),
+    });
+    writeTasks(newTasks, filePath);
+  },
+
+  demoteTask: () => {
+    const { tasks, selected, filePath } = get();
+    if (!TaskTreeUtils.canDemoteTask(tasks, selected)) {
+      set({ message: t("messageCannotDemote") });
+      return;
+    }
+
+    const newLevel = TaskTreeUtils.calculateNewTaskLevel(tasks, selected, 'down');
+    const newTasks = TaskTreeUtils.adjustTaskLevel(tasks, selected, newLevel);
+    
+    set({
+      tasks: newTasks,
+      message: t("messageTaskDemoted"),
+    });
+    writeTasks(newTasks, filePath);
   },
 }));
