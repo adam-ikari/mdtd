@@ -5,14 +5,13 @@ import stringWidth from "string-width";
 type Props = {
   inputValue: string;
   width?: number;
-  label?: string;
 };
 
 function getVisualWidth(str: string) {
   return stringWidth(str);
 }
 
-export default function InputBox({ inputValue, width, label }: Props) {
+export default function InputBox({ inputValue, width }: Props) {
   const [showCursor, setShowCursor] = useState(true);
   const [cursorPos, setCursorPos] = useState(inputValue.length);
 
@@ -29,15 +28,14 @@ export default function InputBox({ inputValue, width, label }: Props) {
   }, [inputValue]);
 
   const visualWidth = getVisualWidth(inputValue);
-  const minWidth = width ?? 8;
+  const minWidth = width ?? 20;
   const padding = Math.max(0, minWidth - visualWidth);
 
   return (
-    <Box>
-      {label && <Text>{label}</Text>}
-      <Text backgroundColor="gray">
+    <Box borderStyle="single" paddingX={1} borderColor="green">
+      <Text color="white" backgroundColor="black">
         {inputValue.slice(0, cursorPos)}
-        {showCursor ? "█" : inputValue.slice(cursorPos, cursorPos + 1) || " "}
+        {showCursor ? "▌" : inputValue.slice(cursorPos, cursorPos + 1) || " "}
         {inputValue.slice(cursorPos + (showCursor ? 0 : 1))}
         {" ".repeat(padding)}
       </Text>
