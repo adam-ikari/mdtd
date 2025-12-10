@@ -14,7 +14,10 @@ export type TKey =
 	| 'controlsList'
 	| 'controlsAdd'
 	| 'messageCannotPromote'
-	| 'messageCannotDemote';
+	| 'messageCannotDemote'
+	| 'messageCannotMove'
+	| 'messageTaskPromoted'
+	| 'messageTaskDemoted';
 
 const translationsMap = {
 	en: enTranslations,
